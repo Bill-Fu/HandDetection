@@ -122,6 +122,7 @@ public class Hand {
 	
 	public void update(Mat im)
 	{
+		//大概就是常见的一张彩色的图片就是有红、绿、蓝三个通道
 		if(im.channels()==3)
 		{
 			cvtColor(im, hsvImg, CV_BGR2HSV);
