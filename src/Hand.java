@@ -98,10 +98,6 @@ public class Hand {
 	    
 //	    KF=new KFilter();
 	    File f = new File("src/palmCascadeClassifier.xml");
-	    if (f == null)
-	    {
-	    	System.out.println("Can't open file!");
-	    }
 	    	    
 	    palmCascade=new CascadeClassifier(f.getAbsolutePath());
 	    palms=new RectVector();
@@ -137,7 +133,8 @@ public class Hand {
 		{
 			//process depth image
 		}
-		
+
+
 		
 		palmCascade.detectMultiScale(grayImg, palms, 1.1, 2, CV_HAAR_SCALE_IMAGE, new Size(100,100), new Size(500,500));
 		
@@ -145,12 +142,12 @@ public class Hand {
 		for(int idx=0;idx<palms.size();idx++)
 		{
 			palm=palms.get(idx);
-//			System.out.println(idx+" palm detected");
+			System.out.println(idx+" palm detected");
 			rectangle(resultImg,palm,new Scalar(0,255,0,0));
 		}
 		calcHist(hsvImg,1,channels,mask,hist,1,histSize,ranges);
-//		calcBackProject(hsvImg,1,channels,hist,backproj,ranges);
-//		cvtColor(backproj, resultImg, CV_GRAY2RGBA);
+		calcBackProject(hsvImg,1,channels,hist,backproj,ranges);
+		cvtColor(backproj, resultImg, CV_GRAY2RGBA);
 		
 		printMat(hist);
 		erode(imgThreshed,imgThreshed,kernel);
@@ -167,7 +164,7 @@ public class Hand {
 		}
 		detected=true;
 		
-		//extractCog(list[0]);
+		extractCog(list[0]);
 		
 		findFingerTips(list[0]);
 		
@@ -330,6 +327,12 @@ public class Hand {
 	public Mat getResult()
 	{
 		return resultImg; 
+	}
+
+	//for debugging
+	public Mat getTmp()
+	{
+		return grayImg;
 	}
 	
 	public void setHSV(int midH,int varH,int midS,int varS,int midV,int varV)

@@ -18,14 +18,16 @@ public class Main {
        
         Hand hand=new Hand(height,width);
 
-        CanvasFrame frame = new CanvasFrame("Some Title", CanvasFrame.getDefaultGamma()/grabber.getGamma());
+        CanvasFrame frame = new CanvasFrame("手势识别", CanvasFrame.getDefaultGamma()/grabber.getGamma());
+        CanvasFrame tmpFrame = new CanvasFrame("Debug使用", CanvasFrame.getDefaultGamma()/grabber.getGamma());
 
-        while (frame.isVisible() && (grabbedImage = converter.convert(grabber.grab())) != null) {
-        	
+        while (frame.isVisible() && (grabbedImage = converter.convert(grabber.grab())) != null && tmpFrame.isVisible()) {
         	hand.update(grabbedImage);
         	cvtColor(hand.getResult(), outImage, CV_RGBA2BGR);
             Frame outFrame = converter.convert(outImage);
-            frame.showImage(outFrame);  
+            frame.showImage(outFrame);
+            Frame debugFrame = converter.convert(hand.getTmp());
+            tmpFrame.showImage(debugFrame);
 
         }
 
