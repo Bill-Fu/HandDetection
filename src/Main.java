@@ -4,7 +4,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        FrameGrabber grabber = FrameGrabber.createDefault(0);//replace 0 for default camera
+        FrameGrabber grabber = FrameGrabber.createDefault(1);//replace 0 for default camera
         grabber.start();
 
         OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
@@ -16,7 +16,7 @@ public class Main {
         Mat grayImage  = new Mat(height,width,CV_8UC1);
         Mat outImage= new Mat(height,width,CV_8UC3); 
        
-        Hand hand=new Hand(height,width);
+        Hand hand=new Hand(height,width, grabbedImage);
 
         CanvasFrame frame = new CanvasFrame("手势识别", CanvasFrame.getDefaultGamma()/grabber.getGamma());
         CanvasFrame tmpFrame = new CanvasFrame("Debug使用", CanvasFrame.getDefaultGamma()/grabber.getGamma());

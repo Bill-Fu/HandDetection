@@ -29,6 +29,7 @@ public class Hand {
 	private static Mat hsvUpper,hsvUpper2;
 	
 	private int h,w;
+	private Mat background;
 	  // defects data for the hand contour
 	private ArrayList<Point> fingerTips;	
 
@@ -47,6 +48,7 @@ public class Hand {
 	private Mat kernel,kernel2;
 	private MatVector contours;
 	private Mat[] list;
+	private Mat diffImg;
 	
 	/******************Kalman Filter*********************************/
 	private KFilter KF;
@@ -72,15 +74,19 @@ public class Hand {
 	private String[] dynamicGestureName={"None","Move","Hold","Click","Bloom"};
 
 	
-	public Hand(int height,int width)
+	public Hand(int height,int width, Mat Back)
 	{
 		h=height;
 		w=width;
+		background=new Mat(height,width,CV_8UC1);
 		resultImg = new Mat(height,width,CV_8UC4);
 		imgThreshed = new Mat(height,width,CV_8UC1);
 		imgThreshed2 = new Mat(height,width,CV_8UC1);
-		
+		diffImg = new Mat(height, width, CV_8UC1);
+
 		backproj= new Mat(height,width,CV_8UC1);
+
+		cvtColor(Back, background,CV_BGR2GRAY);
 
 		kernel=new Mat(8, 8, CV_8U, new Scalar(1d));//opencv erode and dilate kernel
 		kernel2=new Mat(kernelDist, kernelDist, CV_8U, new Scalar(1d));
@@ -134,7 +140,23 @@ public class Hand {
 			//process depth image
 		}
 
-
+		for(int i=0;i<grayImg.rows();++i){
+			for(int j=0;j<grayImg.cols();++j){
+				BytePointer bytePointer1 = grayImg.ptr(i,j);
+				BytePointer bytePointer2 = background.ptr(i,j);
+				BytePointer bytePointer3 = diffImg.ptr(i,j);
+				int v1 = bytePointer1.get(0);
+				int v2 = bytePointer2.get(0);
+				if((v1 - v2 < 20) && (v2 - v1 < 20)){
+					byte b;
+					b=0;
+					bytePointer3.put(b);
+				}
+				else{
+					bytePointer3.put(bytePointer1.get(0));
+				}
+			}
+		}
 		
 		palmCascade.detectMultiScale(grayImg, palms, 1.1, 2, CV_HAAR_SCALE_IMAGE, new Size(100,100), new Size(500,500));
 		
@@ -152,9 +174,7 @@ public class Hand {
 		printMat(hist);
 		erode(imgThreshed,imgThreshed,kernel);
 		dilate(imgThreshed, imgThreshed, kernel);
-		
-		innerCircle(imgThreshed2);		
-		
+		innerCircle(imgThreshed2);
 		
 		list[0]=findBiggestContour(imgThreshed);
 		if(list[0]==null)
@@ -332,7 +352,7 @@ public class Hand {
 	//for debugging
 	public Mat getTmp()
 	{
-		return grayImg;
+		return diffImg;
 	}
 	
 	public void setHSV(int midH,int varH,int midS,int varS,int midV,int varV)
